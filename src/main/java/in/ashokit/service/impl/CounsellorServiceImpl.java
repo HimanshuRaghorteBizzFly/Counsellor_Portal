@@ -50,11 +50,14 @@ public class CounsellorServiceImpl implements CounsellorService {
 		 int enrolledCnt = statusWiseCnt.getOrDefault("ENROLLED", 0l).intValue();
 		 int lostCnt = statusWiseCnt.getOrDefault("LOST", 0l).intValue();
 		 
+		 double conversionRate = totalCnt > 0 ? Math.round((enrolledCnt * 100.0 / totalCnt) * 10.0) / 10.0 : 0.0;
+		 
 		 DashboardResponseDto responseDto = DashboardResponseDto.builder()
 				 												.totalEnqs(totalCnt)
 				 												.openEnqs(openCnt)
 				 												.enrolledEnqs(enrolledCnt)
 				 												.lostEnqs(lostCnt)
+				 												.conversionRate(conversionRate)
 				 												.build();
 		return responseDto;
 	}

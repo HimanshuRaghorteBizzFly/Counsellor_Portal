@@ -25,7 +25,12 @@ public class EnquiryController {
 	private EnquiryService enqService;
 
 	@GetMapping("/enquiry")
-	public String loadAddEnqForm(Model model) {
+	public String loadAddEnqForm(Model model, HttpServletRequest req) {
+
+		HttpSession session = req.getSession(false);
+		if (session == null || session.getAttribute("CID") == null) {
+			return "redirect:/";
+		}
 
 		model.addAttribute("enqDto", new EnquiryDto());
 		model.addAttribute("courses", enqService.getCourses());
@@ -34,7 +39,12 @@ public class EnquiryController {
 	}
 
 	@GetMapping("/editEnq")
-	public String editEnquiry(@RequestParam("enqId") Integer enqId, Model model) {
+	public String editEnquiry(@RequestParam("enqId") Integer enqId, Model model, HttpServletRequest req) {
+
+		HttpSession session = req.getSession(false);
+		if (session == null || session.getAttribute("CID") == null) {
+			return "redirect:/";
+		}
 
 		Enquiry enquiry = enqService.getEnquiry(enqId);
 
@@ -52,6 +62,9 @@ public class EnquiryController {
 	public String addEnquiry(@ModelAttribute("enqDto") EnquiryDto enqDto, Model model, HttpServletRequest req) {
 
 		HttpSession session = req.getSession(false);
+		if (session == null || session.getAttribute("CID") == null) {
+			return "redirect:/";
+		}
 		Integer counsellorId = (Integer) session.getAttribute("CID");
 
 		boolean isSaved = enqService.insertEnquiry(enqDto, counsellorId);
@@ -69,6 +82,9 @@ public class EnquiryController {
 	public String viewEnquiries(Model model, HttpServletRequest req) {
 
 		HttpSession session = req.getSession(false);
+		if (session == null || session.getAttribute("CID") == null) {
+			return "redirect:/";
+		}
 		Integer counsellorId = (Integer) session.getAttribute("CID");
 
 		List<Enquiry> enqsList = enqService.getAllEnquiries(counsellorId);
@@ -86,11 +102,24 @@ public class EnquiryController {
 			HttpServletRequest req) {
 
 		HttpSession session = req.getSession(false);
+		if (session == null || session.getAttribute("CID") == null) {
+			return "redirect:/";
+		}
 		Integer counsellorId = (Integer) session.getAttribute("CID");
 		List<Enquiry> enqsList = enqService.getEnquiriesWithFilter(filter, counsellorId);
 		model.addAttribute("courses", enqService.getCourses());
 		model.addAttribute("enqs", enqsList);
 		return "view-enqs";
+	}
+
+	@GetMapping("/deleteEnq")
+	public String deleteEnquiry(@RequestParam("enqId") Integer enqId, HttpServletRequest req) {
+		HttpSession session = req.getSession(false);
+		if (session != null && session.getAttribute("CID") != null) {
+			Integer counsellorId = (Integer) session.getAttribute("CID");
+			enqService.deleteEnquiry(enqId, counsellorId);
+		}
+		return "redirect:/view-enquiries";
 	}
 
 }

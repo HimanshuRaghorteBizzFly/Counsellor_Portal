@@ -1,5 +1,7 @@
 package in.ashokit.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,7 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import in.ashokit.dto.DashboardResponseDto;
 import in.ashokit.entities.Counsellor;
+import in.ashokit.entities.Enquiry;
 import in.ashokit.service.CounsellorService;
+import in.ashokit.service.EnquiryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -17,6 +21,9 @@ public class CounsellorController {
 
 	@Autowired
 	private CounsellorService counsellorService;
+
+	@Autowired
+	private EnquiryService enquiryService;
 
 	@GetMapping("/")
 	public String index(Model model) {
@@ -70,11 +77,16 @@ public class CounsellorController {
 	public String dashboard(Model model, HttpServletRequest req) {
 
 		HttpSession session = req.getSession(false);
+		if (session == null || session.getAttribute("CID") == null) {
+			return "redirect:/";
+		}
 		Integer counsellorId = (Integer) session.getAttribute("CID");
 
 		DashboardResponseDto dashboardInfoObj = counsellorService.getDashboardInfo(counsellorId);
+		List<Enquiry> recentEnquiries = enquiryService.getAllEnquiries(counsellorId);
 
 		model.addAttribute("dashboardInfo", dashboardInfoObj);
+		model.addAttribute("recentEnquiries", recentEnquiries);
 
 		return "dashboard";
 

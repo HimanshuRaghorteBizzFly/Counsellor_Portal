@@ -21,4 +21,6 @@ public interface EnquiryService {
 
 	public boolean updateEnquiry(EnquiryDto enquiry);
 
+	public boolean deleteEnquiry(Integer enqId, Integer counsellorId);
+
 }
